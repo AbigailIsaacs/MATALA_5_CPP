@@ -23,53 +23,235 @@ TEST_CASE("size(), removeElement(), addElement()") {
     
 }
 
-
-TEST_CASE("AscendingIterator, begin(), end()") {
+TEST_CASE("AscendingIterator, begin(), end(),++") {
     MagicalContainer container;
-    container.addElement(17);
     MagicalContainer::AscendingIterator iterator(container);
-    CHECK_EQ(*iterator.begin(),NULL);
-    CHECK(*iterator == 17);
-    CHECK_EQ(*iterator.begin(),17);
-    CHECK_EQ(*iterator.end(),17);
-    CHECK_EQ(*iterator.end(),*iterator.begin());
+    CHECK_EQ(*iterator.begin(),*iterator.end());
+    container.addElement(-5);
+    CHECK_EQ(*iterator.begin(),-5);
+    container.addElement(5);
     container.addElement(2);
-    container.addElement(25);
-    container.addElement(9);
+    container.addElement(4);
     container.addElement(3);
-    ++iterator;
-    CHECK(*iterator == 2);
-    ++iterator;
-    CHECK(*iterator == 25);
-    ++iterator;
-    CHECK(*iterator == 9);
-    ++iterator;
-    CHECK(*iterator == 3);
-    CHECK(iterator == iterator.end());
+    container.addElement(-1);
+    container.addElement(-4);
+    container.addElement(0);
+
+    CHECK(*iterator ==-5);
+    iterator++;
+    CHECK(*iterator ==-4);
+    iterator++;
+    CHECK(*iterator ==-1);
+    iterator++;
+    CHECK(*iterator ==0);
+    iterator++;
+    CHECK(*iterator ==2);
+    iterator++;
+    CHECK(*iterator ==3);
+    iterator++;
+    CHECK(*iterator ==4);
+    iterator++;
+    CHECK(*iterator == 5);
+
+    container.addElement(-6);
+    iterator++;
+    CHECK(iterator==iterator.end());
+    CHECK_THROWS(iterator++);
     
 }
 
-TEST_CASE("SideCrossIterator") {
+
+TEST_CASE("SideCrossIterator, begin(), end(),++") {
     MagicalContainer container;
-    container.addElement(17);
-    MagicalContainer::AscendingIterator iterator(container);
-    CHECK_EQ(*iterator.begin(),NULL);
-    CHECK(*iterator == 17);
-    CHECK_EQ(*iterator.begin(),17);
-    CHECK_EQ(*iterator.end(),17);
-    CHECK_EQ(*iterator.end(),*iterator.begin());
+    MagicalContainer::SideCrossIterator iterator(container);
+    CHECK_EQ(*iterator.begin(),*iterator.end());
+
+    container.addElement(-5);
+    CHECK_EQ(*iterator.begin(),-5);
+
+    container.addElement(5);
     container.addElement(2);
-    container.addElement(25);
-    container.addElement(9);
+    container.addElement(4);
     container.addElement(3);
-    ++iterator;
+    container.addElement(-1);
+    container.addElement(-4);
+    container.addElement(0);
+
+    CHECK(*iterator==-5);
+    iterator++;
+    CHECK(*iterator == 5);
+    iterator++;
+    CHECK(*iterator==-4);
+    iterator++;
+    CHECK(*iterator ==4);
+    iterator++;
+    CHECK(*iterator ==-1);
+    iterator++;
     CHECK(*iterator == 3);
-    ++iterator;
+    iterator++;
+    CHECK(*iterator == 0);
+    iterator++;
     CHECK(*iterator == 2);
-    ++iterator;
-    CHECK(*iterator == 9);
-    ++iterator;
-    CHECK(*iterator == 25);
-    CHECK(iterator != iterator.end());
- 
+
+    container.addElement(-6);
+    iterator++;
+    CHECK(iterator==iterator.end());
+    CHECK_THROWS(iterator++);
+    
 }
+
+// Test case for the PrimeIterator
+TEST_CASE("PrimeIterator, begin(), end(),++") {
+    MagicalContainer container;
+    container.addElement(-3);
+    container.addElement(8);
+    container.addElement(10);
+    container.addElement(12);
+
+    MagicalContainer::PrimeIterator iterator(container);
+    CHECK_EQ(*iterator.begin(),*iterator.end());
+
+    container.addElement(1);
+    container.addElement(2);
+    container.addElement(3);
+    container.addElement(4);
+    container.addElement(5);
+    container.addElement(-5);
+    container.addElement(6);
+    container.addElement(11);
+   
+    
+    CHECK(*iterator == 2);
+    iterator++;
+    CHECK(*iterator == 3);
+    iterator++;
+    CHECK(*iterator == 5);
+    iterator++;
+    CHECK(*iterator == 11);
+
+    container.addElement(7);
+    
+    iterator++;
+    CHECK(iterator == iterator.end());
+    CHECK_THROWS(iterator++);
+
+}
+
+TEST_CASE("==,!=, <, >") {
+    MagicalContainer container;
+    container.addElement(1);
+    container.addElement(2);
+    container.addElement(3);
+    container.addElement(4);
+    container.addElement(5);
+
+    MagicalContainer::AscendingIterator iterator1(container);
+    MagicalContainer::AscendingIterator iterator2(container);
+    for(int i=0;i<5;i++){
+        CHECK(iterator1 == iterator2);
+        CHECK_FALSE((iterator1 != iterator2));
+        CHECK_FALSE(iterator1 < iterator2);
+        CHECK_FALSE(iterator1 > iterator2);
+        iterator1++;
+        iterator2++;
+    }    
+    
+    MagicalContainer::SideCrossIterator iterator3(container);
+    MagicalContainer::SideCrossIterator iterator4(container);
+    CHECK(iterator3 == iterator4);
+    CHECK_FALSE((iterator3 != iterator4));
+    CHECK_FALSE(iterator3 < iterator4);
+    CHECK_FALSE(iterator3 > iterator4);
+    for(int i=0;i<5;i++){
+        CHECK(iterator3 == iterator4);
+        CHECK_FALSE((iterator3 != iterator4));
+        CHECK_FALSE(iterator3 < iterator4);
+        CHECK_FALSE(iterator3 > iterator4);
+        iterator3++;
+        iterator4++;
+    }
+    
+    MagicalContainer::PrimeIterator iterator5(container);
+    MagicalContainer::PrimeIterator iterator6(container);
+    CHECK(iterator5 == iterator6);
+    CHECK_FALSE((iterator5 != iterator6));
+    CHECK_FALSE(iterator5 < iterator6);
+    CHECK_FALSE(iterator5 > iterator6);
+    for(int i=0;i<5;i++){
+        CHECK(iterator5 == iterator6);
+        CHECK_FALSE((iterator5 != iterator6));
+        CHECK_FALSE(iterator5 < iterator6);
+        CHECK_FALSE(iterator5 > iterator6);
+        iterator5++;
+        iterator6++;
+    }
+    
+}
+
+TEST_CASE("= , CHECKS THAT THE IRERATORS ARE INDEPENDEND") {
+    MagicalContainer container1;
+    MagicalContainer container2;
+    container1.addElement(1);
+    container1.addElement(2);
+    container1.addElement(3);
+
+    container2.addElement(4);
+    container2.addElement(5);
+    container2.addElement(6);
+
+    MagicalContainer::AscendingIterator iterator1(container1);
+    MagicalContainer::AscendingIterator iterator2(container2);
+    CHECK(*iterator2 == 1);
+    iterator2++; 
+
+    iterator1 = iterator2;
+
+    CHECK(*iterator1 == 2);
+    iterator1++;
+    CHECK(*iterator2 == 2);
+    iterator2++;
+    CHECK(*iterator1 == 3);
+    iterator1++;
+    CHECK(*iterator2 == 3);
+    iterator2++;
+
+
+     
+    MagicalContainer::SideCrossIterator iterator3(container2);
+    MagicalContainer::SideCrossIterator iterator4(container2);
+
+    CHECK(*iterator4 == 1);
+    iterator4++;
+
+    iterator3 = iterator4;
+    
+    CHECK(*iterator3 == 2);
+    iterator3++;
+    CHECK(*iterator4 == 2);
+    iterator4++;
+    CHECK(*iterator3 == 3);
+    iterator3++;
+    CHECK(*iterator4 == 3);
+    iterator4++;
+    
+    MagicalContainer container3; 
+    MagicalContainer::PrimeIterator iterator5(container3);
+    MagicalContainer::PrimeIterator iterator6(container3);
+    CHECK(*iterator6 == 1);
+    iterator6++;
+    iterator5 = iterator6;
+
+    CHECK(*iterator5 == 2);
+    iterator5++;
+    CHECK(*iterator6 == 2);
+    iterator6++;
+    CHECK(*iterator5 == 3);
+    iterator5++;
+    CHECK(*iterator6 == 3);
+    iterator6++;
+   
+}
+
+
+
+
